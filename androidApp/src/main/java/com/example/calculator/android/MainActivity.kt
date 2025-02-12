@@ -52,54 +52,42 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
-fun CalculatorView()
-{
-
+fun CalculatorView() {
     var num1 by remember { mutableStateOf("") }
-
     var num2 by remember { mutableStateOf("") }
-
     var result by remember { mutableStateOf("") }
-
     var selectedOperation by remember { mutableStateOf("Add") }
-
     var expanded by remember { mutableStateOf(false) }
-
-
     val operations = listOf("Add", "Subtract", "Multiply", "Divide", "Square")
+    val calculator = Calculator()
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp),
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center
     ) {
-
         Text(
-            text =
-            "Math Solver",
+            text = "Math Solver",
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp))
+            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+        )
 
         TextField(
             value = num1,
             onValueChange = { num1 = it },
-            label = { Text(
-                "Enter first number"
-            ) },
+            label = { Text("Enter first number") },
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
 
-
         if (selectedOperation != "Square") {
-            Spacer(modifier = Modifier.height(
-                8.
-                dp))
+            Spacer(modifier = Modifier.height(8.dp))
             TextField(
                 value = num2,
                 onValueChange = { num2 = it },
-                label = { Text(
-                    "Enter second number"
-                ) },
+                label = { Text("Enter second number") },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -113,12 +101,8 @@ fun CalculatorView()
             TextField(
                 value = selectedOperation,
                 onValueChange = {},
-                label = { Text(
-                    "Select Operation"
-                ) },
-                readOnly =
-                true
-                ,
+                label = { Text("Select Operation") },
+                readOnly = true,
                 modifier = Modifier.fillMaxWidth().menuAnchor()
             )
             ExposedDropdownMenu(
@@ -129,8 +113,7 @@ fun CalculatorView()
                         text = { Text(operation) },
                         onClick = {
                             selectedOperation = operation
-                            expanded =
-                                false
+                            expanded = false
                         }
                     )
                 }
@@ -138,44 +121,30 @@ fun CalculatorView()
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = { val n1 = num1.toDoubleOrNull()
-
+        Button(onClick = {
+            val n1 = num1.toDoubleOrNull()
             val n2 = num2.toDoubleOrNull()
 
-            result = when (selectedOperation) { "Add"
-                        -> (n1?.plus(n2 ?: 0.0
-                    ))?.toString() ?:
-                    "Invalid input"
-                    "Subtract" -> (n1?.minus(n2 ?: 0.0))?.toString() ?:
-                    "Invalid input"
-                    "Multiply" -> (n1?.times(n2 ?: 0.0
-                    ))?.toString() ?:
-                    "Invalid input"
-                    "Divide" ->
-                        if (n2 != 0.0) (n1?.div(n2 ?: 1.0
-                        ))?.toString() ?:
-                        "Invalid input"
-                        else
-                            "Cannot divide by zero"
-                             "Square" -> (n1?.times(n1))?.toString() ?:
-                             "Invalid input"
-                    else
-                        ->
-                        "Unknown operation"
+            result = when (selectedOperation) {
+                "Add" -> n1?.let { calculator.add(it, n2 ?: 0.0).toString() } ?: "Invalid input"
+                "Subtract" -> n1?.let { calculator.subtract(it, n2 ?: 0.0).toString() } ?: "Invalid input"
+                "Multiply" -> n1?.let { calculator.multiply(it, n2 ?: 0.0).toString() } ?: "Invalid input"
+                "Divide" -> n1?.let {
+                    n2?.let { secondNum ->
+                        calculator.divide(it, secondNum)?.toString() ?: "Cannot divide by zero"
+                    } ?: "Invalid input"
+                } ?: "Invalid input"
+                "Square" -> n1?.let { calculator.square(it).toString() } ?: "Invalid input"
+                else -> "Unknown operation"
             }
         }) {
-            Text(
-                "Calculate"
-            )
+            Text("Calculate")
         }
-
-        Spacer(modifier = Modifier.height(
-            8.
-            dp))
-        Text(
-            "Result:$result")
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Result: $result")
     }
 }
+
 
 
 @Preview
